@@ -40,11 +40,11 @@ class _LoginScreenState extends State<LoginScreen> {
         String uid = userCredential.user!.uid; // Get the unique user ID (uid)
 
         // Store or update the user's data in Firestore
-        await _firestore.collection('users').doc(uid).set({
-          'email': email,
-          'id': uid, // Store the unique user ID
-          'lastLogin': DateTime.now(), // Store the last login time
-        }, SetOptions(merge: true)); // Merge with existing data
+        // await _firestore.collection('users').doc(uid).set({
+        //   'email': email,
+        //   'id': uid, // Store the unique user ID
+        //   'lastLogin': DateTime.now(), // Store the last login time
+        // }, SetOptions(merge: true)); // Merge with existing data
 
         // Navigate to DashboardScreen
         Navigator.pushReplacement(

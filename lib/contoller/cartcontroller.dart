@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
@@ -19,7 +18,7 @@ class CartlistController extends GetxController {
   void clearCart() {
     cartList.clear();
     subtotal.value = 0.0;
-    Get.snackbar('Cleared', 'Cart has been cleared for the new user');
+    // Get.snackbar('Cleared', 'Cart has been cleared for the new user');
   }
 
   // Fetch cart list from Firestore for the logged-in user
@@ -50,7 +49,7 @@ class CartlistController extends GetxController {
       try {
         await _firestore.collection("cart").add({
           ...product.toJson(),
-          'userId': user.uid, // Add userId to the cart item
+          'userId': product.userId, // Add userId to the cart item
         });
         cartList.add(product);
         calculateTotal();

@@ -43,6 +43,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           'id': credential.user!.uid,
           'name': name,
           'email': email,
+          'wishlist': [], // Initialize empty wishlist
+          'cart': [], // Initialize empty cart
         });
 
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

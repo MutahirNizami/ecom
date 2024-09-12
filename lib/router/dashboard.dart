@@ -39,70 +39,69 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _checkUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      // Redirect to login if no user is logged in
+      // Redirect to login screen if no user is logged in
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => const LoginScreen(),
         ),
       );
-    } else {
-      try {
-        // Fetch the user's document from Firestore
-        var userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
+      return;
+    }
 
-        if (userDoc.exists) {
-          var userData = userDoc.data();
-          log("userData $userData");
+    try {
+      // Fetch user document from Firestore
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
 
-          if (userData != null) {
-            // Retrieve wishlist and cart data from Firestore
-            var wishlist = userData['wishlist'] as List?;
-            var cart = userData['cart'] as List?;
+      if (userDoc.exists) {
+        // If the user document exists, check and load the wishlist and cart
+        var userData = userDoc.data();
+        if (userData != null) {
+          var wishlist = userData['wishlist'] as List?;
+          var cart = userData['cart'] as List?;
 
-            // Clear wishlist and cart if they are empty
-            if (wishlist == null || wishlist.isEmpty) {
-              _wishlistController.clearWishlist();
-            } else {
-              // Fetch wishlist data from Firestore
-              _wishlistController.fetchWishlist(user.uid);
-            }
-
-            if (cart == null || cart.isEmpty) {
-              _cartlistController.clearCart();
-            } else {
-              // Fetch cart data from Firestore (implement similar method as fetchWishlist)
-              _cartlistController.fetchCart(user.uid);
-            }
+          if (wishlist != null && wishlist.isNotEmpty) {
+            // Fetch wishlist data
+            _wishlistController.fetchWishlist(user.uid);
+          } else {
+            _wishlistController.clearWishlist();
           }
-        } else {
-          // If user document does not exist, clear wishlist and cart for the new user
-          _wishlistController.clearWishlist();
-          _cartlistController.clearCart();
 
-          // Optionally, create an empty document for the new user
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(user.uid)
-              .set({
-            'wishlist': [],
-            'cart': [],
-          });
+          if (cart != null && cart.isNotEmpty) {
+            // Fetch cart data
+            _cartlistController.fetchCart(user.uid);
+          } else {
+            _cartlistController.clearCart();
+          }
+
+          // // Notify the UI to update
+          // setState(() {});
         }
-      } catch (e) {
-        log('Error checking user data: ${e.toString()}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error occurred: ${e.toString()}'),
-          ),
-        );
+      } else {
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'wishlist': [],
+          'cart': [],
+        });
+
+        _wishlistController.clearWishlist();
+        _cartlistController.clearCart();
+
+        // // Notify the UI to update
+        //  setState(() {});
       }
+    } catch (e) {
+      log('Error checking user data: ${e.toString()}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error occurred: ${e.toString()}'),
+        ),
+      );
     }
   }
 

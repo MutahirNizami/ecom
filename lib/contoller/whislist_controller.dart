@@ -24,7 +24,7 @@ class WishlistController extends GetxController {
 
   void clearWishlist() {
     wishList.clear();
-    Get.snackbar('Cleared', 'Wishlist has been cleared for the new user');
+    // Get.snackbar('Cleared', 'Wishlist has been cleared for the new user');
   }
 
   // Fetch the wishlist from Firestore for the logged-in user

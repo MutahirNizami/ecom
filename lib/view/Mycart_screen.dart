@@ -4,10 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newappui_8/contoller/cartcontroller.dart';
-import 'package:newappui_8/router/dashboard.dart';
+
 import 'package:newappui_8/utilis/colors.dart';
 import 'package:newappui_8/view/checkout_screen.dart';
-import 'package:newappui_8/view/ecom_product.dart';
+
 import 'package:newappui_8/view/recentsearch_screen.dart';
 import 'package:newappui_8/widgets/button.dart';
 
@@ -40,11 +40,7 @@ class _MycartScreenState extends State<MycartScreen> {
               children: [
                 InkWell(
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DashboardScreen(),
-                          ));
+                      Navigator.pop(context);
                     },
                     child: Icon(Icons.arrow_back)),
                 Text(
