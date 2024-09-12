@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "342387232632",
+    "project_id": "myapp-6a9b3",
+    "storage_bucket": "myapp-6a9b3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:342387232632:android:bb4dee7b481e423953c28d",
+        "android_client_info": {
+          "package_name": "com.example.newappui_8"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "342387232632-lctv3e2lin80po6m8jmhcc7npn82egjt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.newappui_8",
+            "certificate_hash": "e91f1429cfab0e617b15790893fa9ff6fc38913b"
+          }
+        },
+        {
+          "client_id": "342387232632-5a1be4gfb9lphr2jehc21c33gph9kmt0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGEUndJwGGSWqv1zcHgvkGCKs_wRIXLWM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "342387232632-5a1be4gfb9lphr2jehc21c33gph9kmt0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
