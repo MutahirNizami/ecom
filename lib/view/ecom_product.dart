@@ -1,17 +1,15 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:newappui_8/contoller/cartcontroller.dart';
 import 'package:newappui_8/contoller/product_controller.dart';
-import 'package:newappui_8/model/Apimodel.dart';
+
 import 'package:newappui_8/model/gridmodel.dart';
 import 'package:newappui_8/utilis/craiusolslidermodel_lists.dart';
 import 'package:newappui_8/utilis/colors.dart';
-import 'package:newappui_8/view/Accountdetail/sign_up_screen.dart';
+import 'package:newappui_8/view/Accountdetail/login_screen.dart';
+
 import 'package:newappui_8/view/Mycart_screen.dart';
 import 'package:newappui_8/view/Wishlist_Screen.dart';
 
@@ -75,7 +73,7 @@ class EcomProductScreen extends StatelessWidget {
                   SizedBox(width: width * 0.03),
                   InkWell(
                     onTap: () {
-                      Get.to(() => WishlistScreen());
+                      Get.to(() => const WishlistScreen());
                     },
                     child: Icon(
                       Icons.favorite,
@@ -86,12 +84,11 @@ class EcomProductScreen extends StatelessWidget {
                   InkWell(
                     onTap: () {
                       _signOut().then((value) {
-                        Navigator.pushAndRemoveUntil(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SignUpScreen(),
+                            builder: (context) => const LoginScreen(),
                           ),
-                          (route) => route.isFirst,
                         );
                       });
                     },

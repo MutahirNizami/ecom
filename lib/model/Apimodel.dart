@@ -43,6 +43,8 @@ class ApiModel {
       rating: Rating.fromJson(json["rating"]),
       items: json["items"] ?? 1);
 
+  get isFavorite => null;
+
   Map<String, dynamic> toJson() => {
         "id": id,
         "title": title,

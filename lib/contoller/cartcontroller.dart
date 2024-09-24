@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:newappui_8/model/Apimodel.dart';
+import 'package:newappui_8/utilis/colors.dart';
 
 class CartlistController extends GetxController {
   final _firestore = FirebaseFirestore.instance;
@@ -18,7 +19,6 @@ class CartlistController extends GetxController {
   void clearCart() {
     cartList.clear();
     subtotal.value = 0.0;
-    // Get.snackbar('Cleared', 'Cart has been cleared for the new user');
   }
 
   // Fetch cart list from Firestore for the logged-in user
@@ -49,7 +49,7 @@ class CartlistController extends GetxController {
       try {
         await _firestore.collection("cart").add({
           ...product.toJson(),
-          'userId': product.userId, // Add userId to the cart item
+          'userId': user.uid, // Add userId to the cart item
         });
         cartList.add(product);
         calculateTotal();
@@ -60,32 +60,45 @@ class CartlistController extends GetxController {
     }
   }
 
-  // Remove a product from the cart
   void removeFromCart(ApiModel product) async {
     final user = _auth.currentUser;
     if (user != null) {
-      try {
-        var snapshot = await _firestore
-            .collection("cart")
-            .where('userId', isEqualTo: user.uid)
-            .where('id', isEqualTo: product.id)
-            .get();
+      // Optimistically remove product from the cartList
+      final currentIndex = cartList.indexOf(product);
+      if (currentIndex != -1) {
+        cartList.removeAt(currentIndex);
+        calculateTotal(); // Update total before async operation
 
-        for (var doc in snapshot.docs) {
-          await doc.reference.delete();
-        }
-
-        cartList.remove(product);
-        calculateTotal();
+        // Show snackbar to indicate immediate UI feedback
         Get.snackbar("Success", "Product removed from cart");
-      } catch (e) {
-        Get.snackbar(
-            "Error", "Failed to remove product from cart: ${e.toString()}");
+
+        try {
+          // Perform Firestore removal asynchronously
+          var snapshot = await _firestore
+              .collection("cart")
+              .where('userId', isEqualTo: user.uid)
+              .where('id', isEqualTo: product.id)
+              .get();
+
+          for (var doc in snapshot.docs) {
+            await doc.reference.delete();
+          }
+        } catch (e) {
+          // If Firestore operation fails, re-add product to cart
+          cartList.insert(currentIndex, product);
+          calculateTotal(); // Recalculate total if we add the product back
+          Get.snackbar(
+            "Error",
+            "Failed to remove product from cart: ${e.toString()}",
+            backgroundColor: Appcolors().heartcolor,
+            colorText: Appcolors().white,
+          );
+        }
       }
     }
   }
 
-  // Check if a product is in the cart
+  // // Check if a product is in the cart
   bool isInCart(ApiModel product) {
     return cartList.any((item) => item.id == product.id);
   }

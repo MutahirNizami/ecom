@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newappui_8/contoller/cartcontroller.dart';
@@ -146,25 +144,115 @@ class Mygrid2 extends StatelessWidget {
 }
 
 // wishlist products....................................
+// class Mygrid3 extends StatelessWidget {
+//   const Mygrid3({super.key, required filteredProducts});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final WishlistController wishlistController = Get.find();
+//     final isFavorite = wishlistController.wishList.contains(wishlistController);
+
+//     return Obx(() {
+//       if (wishlistController.wishList.isEmpty) {
+//         return const Center(child: Text("No items in wishlist"));
+//       }
+//       return GridView.builder(
+//         physics: const NeverScrollableScrollPhysics(),
+//         itemCount: wishlistController.wishList.length,
+//         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+//             crossAxisCount: 2, mainAxisSpacing: 1, childAspectRatio: 3 / 4),
+//         itemBuilder: (context, index) {
+//           final model = wishlistController.wishList[index];
+//           return GestureDetector(
+//             onTap: () {
+//               Get.to(ProductDetailsPage(product: model));
+//             },
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Expanded(
+//                   child: Center(
+//                       child: Stack(
+//                     children: [
+//                       Container(
+//                         padding: const EdgeInsets.all(16),
+//                         decoration: BoxDecoration(
+//                           color: Appcolors().contianercolor,
+//                           borderRadius: BorderRadius.circular(10),
+//                         ),
+//                         child: Image.network(
+//                           model.image.toString(),
+//                         ),
+//                       ),
+//                       Positioned(
+//                         top: 10,
+//                         right: 7,
+//                         child: IconButton(
+//                           icon: Icon(
+//                             Icons.favorite,
+//                             color: Appcolors().heartcolor,
+//                           ),
+//                           onPressed: () {
+//                             if (isFavorite) {
+//                               (wishlistController.addToWishList(model));
+//                             } else {
+//                               wishlistController.removeFromWishList(model);
+//                             }
+//                           },
+//                         ),
+//                       )
+//                     ],
+//                   )),
+//                 ),
+//                 Text(
+//                   model.title.toString(),
+//                   style: TextStyle(color: Appcolors().titletextcolor),
+//                   maxLines: 2,
+//                   overflow: TextOverflow.ellipsis,
+//                   softWrap: true,
+//                 ),
+//                 Text(
+//                   model.price.toString(),
+//                   style: TextStyle(
+//                       fontWeight: FontWeight.w500,
+//                       fontSize: 14,
+//                       color: Appcolors().subtitlecolor),
+//                 ),
+//               ],
+//             ),
+//           );
+//         },
+//       );
+//     });
+//   }
+// }
+
 class Mygrid3 extends StatelessWidget {
-  const Mygrid3({super.key, required filteredProducts});
+  const Mygrid3({super.key, required this.filteredProducts});
+
+  final List<ApiModel> filteredProducts;
 
   @override
   Widget build(BuildContext context) {
     final WishlistController wishlistController = Get.find();
-    final isFavorite = wishlistController.wishList.contains(wishlistController);
 
     return Obx(() {
       if (wishlistController.wishList.isEmpty) {
         return const Center(child: Text("No items in wishlist"));
       }
+
       return GridView.builder(
         physics: const NeverScrollableScrollPhysics(),
         itemCount: wishlistController.wishList.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, mainAxisSpacing: 1, childAspectRatio: 3 / 4),
+          crossAxisCount: 2,
+          mainAxisSpacing: 1,
+          childAspectRatio: 3 / 4,
+        ),
         itemBuilder: (context, index) {
           final model = wishlistController.wishList[index];
+          final isFavorite = wishlistController.isInWishList(model);
+
           return GestureDetector(
             onTap: () {
               Get.to(ProductDetailsPage(product: model));
@@ -174,37 +262,43 @@ class Mygrid3 extends StatelessWidget {
               children: [
                 Expanded(
                   child: Center(
-                      child: Stack(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Appcolors().contianercolor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Image.network(
-                          model.image.toString(),
-                        ),
-                      ),
-                      Positioned(
-                        top: 10,
-                        right: 7,
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.favorite,
-                            color: Appcolors().heartcolor,
+                    child: Stack(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Appcolors().contianercolor,
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          onPressed: () {
-                            if (isFavorite) {
-                              (wishlistController.addToWishList(model));
-                            } else {
-                              wishlistController.removeFromWishList(model);
-                            }
-                          },
+                          child: Image.network(
+                            model.image.toString(),
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      )
-                    ],
-                  )),
+                        Positioned(
+                          top: 10,
+                          right: 7,
+                          child: IconButton(
+                            icon: Icon(
+                              isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: isFavorite
+                                  ? Colors.red
+                                  : Appcolors().heartcolor,
+                            ),
+                            onPressed: () {
+                              if (isFavorite) {
+                                wishlistController.removeFromWishList(model);
+                              } else {
+                                wishlistController.addToWishList(model);
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 Text(
                   model.title.toString(),
@@ -214,11 +308,12 @@ class Mygrid3 extends StatelessWidget {
                   softWrap: true,
                 ),
                 Text(
-                  model.price.toString(),
+                  "\$${model.price.toString()}",
                   style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: Appcolors().subtitlecolor),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                    color: Appcolors().subtitlecolor,
+                  ),
                 ),
               ],
             ),

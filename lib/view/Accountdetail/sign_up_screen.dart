@@ -2,6 +2,9 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:newappui_8/contoller/cartcontroller.dart';
+import 'package:newappui_8/contoller/whislist_controller.dart';
 import 'package:newappui_8/router/dashboard.dart';
 import 'package:newappui_8/utilis/colors.dart';
 import 'package:newappui_8/view/Accountdetail/login_screen.dart';
@@ -24,18 +27,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> signup() async {
-    // Validate that the form is filled out correctly
     if (_formKey.currentState!.validate()) {
       email = _emailController.text.trim();
       name = _nameController.text.trim();
       password = _passwordController.text.trim();
 
       try {
+        // Create a new user with email and password
         UserCredential credential = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
 
         log("User registered with email: ${credential.user?.email}");
 
+        // Save the new user information to Firestore, initializing wishlist and cart as empty
         await FirebaseFirestore.instance
             .collection('users')
             .doc(credential.user!.uid)
@@ -54,40 +58,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ));
 
+        // After successful signup, clear any previous data in the controllers
+        final wishlistController = Get.find<WishlistController>();
+        final cartController = Get.find<CartlistController>();
+
+        wishlistController.clearWishlist(); // Clear wishlist for new user
+        cartController.clearCart(); // Clear cart for new user
+
         // Navigate to DashboardScreen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => DashboardScreen(),
+            builder: (context) => const DashboardScreen(),
           ),
         );
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Appcolors().rattingiconcolor,
-            content: const Text(
-              "Please enter a stronger password",
-              style: TextStyle(fontSize: 20),
-            ),
-          ));
-        } else if (e.code == 'email-already-in-use') {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Appcolors().heartcolor,
-            content: const Text(
-              "This email is already in use",
-              style: TextStyle(fontSize: 20),
-            ),
-          ));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.red,
-            content: Text(
-              "Registration failed: ${e.message}",
-              style: const TextStyle(fontSize: 20),
-            ),
-          ));
-        }
+      } on FirebaseAuthException {
+        log(
+          "error",
+        );
       } catch (e) {
+        // Handle general errors
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Colors.red,
           content: Text(
@@ -118,7 +108,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           children: [
             Center(
               child: SizedBox(
-                height: height * 0.9,
+                height: height * 0.6,
                 width: width * 0.9,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -148,9 +138,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       prefixIcon: Icons.lock,
                     ),
                     Appbutton(
-                      btnheight: height * 0.05,
+                      btnheight: height * 0.07,
                       btnwidth: width * 0.9,
-                      borderradius: height * 0.02,
+                      borderradius: height * 0.025,
                       ontap: () {
                         signup();
                       },

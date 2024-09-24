@@ -18,51 +18,83 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  String email = '', password = '';
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool loading = false;
+  String email = '', password = '';
+  // Method to fetch wishlist and cart data for a specific user
+  Future<void> fetchWishlistAndCartData(String uid) async {
+    try {
+      // Fetch wishlist data for the logged-in user
+      var wishlistSnapshot = await FirebaseFirestore.instance
+          .collection('wishlist')
+          .doc(uid) // Fetch data only for the current user's UID
+          .get();
 
+      var cartSnapshot = await FirebaseFirestore.instance
+          .collection('cart')
+          .doc(uid) // Fetch data only for the current user's UID
+          .get();
+
+      if (wishlistSnapshot.exists) {
+        // Handle wishlist data here (update WishlistController, etc.)
+        log("Wishlist data fetched for user: $uid");
+      }
+
+      if (cartSnapshot.exists) {
+        // Handle cart data here (update CartlistController, etc.)
+        log("Cart data fetched for user: $uid");
+      }
+    } catch (e) {
+      log("Error fetching wishlist or cart: $e");
+    }
+  }
+
+  // Method to handle login process
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         email = _emailController.text.trim();
         password = _passwordController.text.trim();
       });
-
       try {
+        setState(() {
+          loading = true;
+        });
         // Sign in the user
         UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
-        String uid = userCredential.user!.uid; // Get the unique user ID (uid)
 
-        // Store or update the user's data in Firestore
-        // await _firestore.collection('users').doc(uid).set({
-        //   'email': email,
-        //   'id': uid, // Store the unique user ID
-        //   'lastLogin': DateTime.now(), // Store the last login time
-        // }, SetOptions(merge: true)); // Merge with existing data
+        // If user successfully logs in
+        if (userCredential.user != null) {
+          String uid = userCredential.user!.uid;
 
-        // Navigate to DashboardScreen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DashboardScreen(),
-          ),
-        );
-      } on FirebaseAuthException catch (e) {
-        String errorMessage;
+          // Fetch wishlist and cart data for the logged-in user
+          await fetchWishlistAndCartData(uid);
 
-        if (e.code == 'user-not-found') {
-          errorMessage = "User not found. Please sign up first.";
-        } else if (e.code == 'wrong-password') {
-          errorMessage = "Incorrect password. Please try again.";
-        } else {
-          errorMessage = "Login failed: ${e.message}";
+          // Navigate to DashboardScreen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const DashboardScreen(),
+            ),
+          );
         }
+
+        setState(() {
+          loading = false;
+        });
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          loading = false;
+        });
+        String errorMessage = e.code == 'user-not-found'
+            ? "User not found. Please sign up first."
+            : e.code == 'wrong-password'
+                ? "Incorrect password. Please try again."
+                : "Login failed: ${e.message}";
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Appcolors().heartcolor,
@@ -71,19 +103,12 @@ class _LoginScreenState extends State<LoginScreen> {
             style: const TextStyle(fontSize: 20),
           ),
         ));
-
-        log(e.toString());
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Appcolors().heartcolor,
-          content: Text(
-            "An error occurred: ${e.toString()}",
-            style: const TextStyle(fontSize: 20),
-          ),
-        ));
         log(e.toString());
       }
     } else {
+      setState(() {
+        loading = false;
+      });
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text(
           "Please fill in all fields",
@@ -130,15 +155,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       isPassword: true,
                       prefixIcon: Icons.lock,
                     ),
-                    Appbutton(
-                      borderradius: height * 0.025,
-                      btnwidth: width,
-                      btnheight: height * 0.07,
-                      ontap: () {
-                        _login();
-                      },
-                      text: "Log In",
-                    ),
+                    loading
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : Appbutton(
+                            borderradius: height * 0.025,
+                            btnwidth: width,
+                            btnheight: height * 0.07,
+                            ontap: () {
+                              _login();
+                            },
+                            text: "Log In",
+                          ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

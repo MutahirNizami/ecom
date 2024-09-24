@@ -7,9 +7,14 @@ import 'package:newappui_8/utilis/colors.dart';
 import 'package:newappui_8/view/recentsearch_screen.dart';
 import 'package:newappui_8/widgets/gridviewbuilder.dart';
 
-class WishlistScreen extends StatelessWidget {
-  WishlistScreen({super.key});
+class WishlistScreen extends StatefulWidget {
+  const WishlistScreen({super.key});
 
+  @override
+  State<WishlistScreen> createState() => _WishlistScreenState();
+}
+
+class _WishlistScreenState extends State<WishlistScreen> {
   final WishlistController _wishlistController = Get.put(WishlistController());
 
   @override

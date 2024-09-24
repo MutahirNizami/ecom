@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:newappui_8/router/dashboard.dart';
+
+import 'package:newappui_8/view/Accountdetail/login_screen.dart';
 
 import 'package:newappui_8/view/Accountdetail/sign_up_screen.dart';
 
@@ -19,7 +20,7 @@ class _WrapperState extends State<Wrapper> {
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return const DashboardScreen();
+              return const LoginScreen();
             } else {
               return const SignUpScreen();
             }
