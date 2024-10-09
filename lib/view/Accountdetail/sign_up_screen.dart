@@ -47,8 +47,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           'id': credential.user!.uid,
           'name': name,
           'email': email,
-          'wishlist': [], // Initialize empty wishlist
-          'cart': [], // Initialize empty cart
+          'wishlist': [], 
+          'cart': [], 
         });
 
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -58,7 +58,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ));
 
-        // After successful signup, clear any previous data in the controllers
+        
         final wishlistController = Get.find<WishlistController>();
         final cartController = Get.find<CartlistController>();
 

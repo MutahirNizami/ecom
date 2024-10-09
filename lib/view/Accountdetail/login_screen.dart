@@ -22,27 +22,22 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool loading = false;
   String email = '', password = '';
-  // Method to fetch wishlist and cart data for a specific user
+
   Future<void> fetchWishlistAndCartData(String uid) async {
     try {
-      // Fetch wishlist data for the logged-in user
       var wishlistSnapshot = await FirebaseFirestore.instance
           .collection('wishlist')
-          .doc(uid) // Fetch data only for the current user's UID
+          .doc(uid)
           .get();
 
-      var cartSnapshot = await FirebaseFirestore.instance
-          .collection('cart')
-          .doc(uid) // Fetch data only for the current user's UID
-          .get();
+      var cartSnapshot =
+          await FirebaseFirestore.instance.collection('cart').doc(uid).get();
 
       if (wishlistSnapshot.exists) {
-        // Handle wishlist data here (update WishlistController, etc.)
         log("Wishlist data fetched for user: $uid");
       }
 
       if (cartSnapshot.exists) {
-        // Handle cart data here (update CartlistController, etc.)
         log("Cart data fetched for user: $uid");
       }
     } catch (e) {
@@ -50,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // Method to handle login process
+  //  login process
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -71,10 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
         if (userCredential.user != null) {
           String uid = userCredential.user!.uid;
 
-          // Fetch wishlist and cart data for the logged-in user
           await fetchWishlistAndCartData(uid);
 
-          // Navigate to DashboardScreen
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
